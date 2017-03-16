@@ -23,7 +23,13 @@ public class Player2Controller : MonoBehaviour {
 	// Before any physics calculations
 	void FixedUpdate()
 	{
-		float moveVertical = Input.GetAxisRaw ("P2_Vertical");
-		rb2d.velocity = new Vector2 (0, moveVertical) * speed * invert;
+		if(Input.GetKey (InputDefinitions.P2Up))
+			rb2d.velocity = new Vector2 (0, 1) * speed * invert;
+		else if(Input.GetKey (InputDefinitions.P2Down))
+			rb2d.velocity = new Vector2 (0, -1) * speed * invert;		
+		else
+			rb2d.velocity = new Vector2 (0, 0) * speed * invert;	
+		//float moveVertical = Input.GetAxisRaw ("P2_Vertical");
+		//rb2d.velocity = new Vector2 (0, moveVertical) * speed * invert;
 	}
 }

@@ -16,6 +16,7 @@ public class PickUpBehaviour : MonoBehaviour {
 	private bool alive;
 	private float lifetime;
 	private string playerName;
+	private SpriteRenderer spriteRenderer;
 
 	// Use this for initialization
 	void Start () {
@@ -34,6 +35,7 @@ public class PickUpBehaviour : MonoBehaviour {
 		alive = false;
 		lifetime = 0;
 		playerName = "No name";
+		spriteRenderer = GetComponent<SpriteRenderer> ();
 
 		/** Behaviour Table
 		 * 1 = Double Size
@@ -45,6 +47,34 @@ public class PickUpBehaviour : MonoBehaviour {
 		 * TBI 7 = Connecting Top and Bottom Walls
 		 */
 		behaviour = Random.Range (1, 7); 	//Integer version is max-exclusive!
+		loadSprite(behaviour);
+	}
+
+	void loadSprite (int index)
+	{
+		switch(index)
+		{
+		case 1:
+			spriteRenderer.sprite = Resources.Load<Sprite> ("PickUps/PickUpDouble");
+			break;
+		case 2:
+			spriteRenderer.sprite = Resources.Load<Sprite> ("PickUps/PickUpMLG");
+			break;
+		case 3:
+			spriteRenderer.sprite = Resources.Load<Sprite> ("PickUps/PickUpHalf");
+			break;
+		case 4:
+			spriteRenderer.sprite = Resources.Load<Sprite> ("PickUps/PickUpSafetynet");
+			break;
+		case 5:
+			spriteRenderer.sprite = Resources.Load<Sprite> ("PickUps/PickUpNewDirection");
+			break;
+		case 6:
+			spriteRenderer.sprite = Resources.Load<Sprite> ("PickUps/PickUpInvertControls");
+			break;
+		default:
+			break;
+		}
 	}
 	
 	// Update is called once per frame
@@ -255,16 +285,19 @@ public class PickUpBehaviour : MonoBehaviour {
 
 	// Invert Player Controller, keep track of that in Player Script
 	// Keep track of multiple calls to extend the invert period
+	// Starts the confused particle systems
 	void invertPlayerStart(GameObject player)
 	{
 		if (player.name == "Player 1")
 		{
+			player.GetComponentInChildren<ParticleSystem> ().Play ();
 			Player1Controller p1cScript = player.GetComponent<Player1Controller> ();
 			p1cScript.invert = -1;
 			p1cScript.invertExtend += 1;
 		}
 		else if (player.name == "Player 2")
 		{
+			player.GetComponentInChildren<ParticleSystem> ().Play ();
 			Player2Controller p2cScript = player.GetComponent<Player2Controller> ();
 			p2cScript.invert = -1;
 			p2cScript.invertExtend += 1;
@@ -272,7 +305,7 @@ public class PickUpBehaviour : MonoBehaviour {
 
 		startCountdown (3.0f);
 	}
-
+		
 	void invertPlayerEnd(GameObject player)
 	{
 		if (player.name == "Player 1")
@@ -280,14 +313,24 @@ public class PickUpBehaviour : MonoBehaviour {
 			Player1Controller p1cScript = player.GetComponent<Player1Controller> ();
 			p1cScript.invertExtend -= 1;
 			if (p1cScript.invertExtend <= 0)
+			{
 				p1cScript.invert = 1;
+				// Stop and Clear Particles
+				player.GetComponentInChildren<ParticleSystem> ().Stop (true);
+				player.GetComponentInChildren<ParticleSystem> ().Clear ();
+			}
 		}
 		else if (player.name == "Player 2")
 		{
 			Player2Controller p2cScript = player.GetComponent<Player2Controller> ();
 			p2cScript.invertExtend -= 1;
 			if (p2cScript.invertExtend <= 0)
-				p2cScript.invert = 1;
+			{
+				p2cScript.invert = 1;			
+				// Stop and Clear Particles
+				player.GetComponentInChildren<ParticleSystem> ().Stop (true);
+				player.GetComponentInChildren<ParticleSystem> ().Clear ();
+			}
 		}
 	}
 		
