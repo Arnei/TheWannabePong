@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class BallController : MonoBehaviour {
 
 	public float speed;
+	public float speedCap;
 	public float velocityInc;
 	public Text scoreP1Text;
 	public Text scoreP2Text;
@@ -23,6 +24,7 @@ public class BallController : MonoBehaviour {
 	public AudioClip audioGameWon;
 	public ParticleSystem psOnDeath;
 	public ParticleSystem psTrail;
+	public GameObject field;
 
 	private Rigidbody2D rb2d;
 	private Vector2 startpos;
@@ -37,6 +39,10 @@ public class BallController : MonoBehaviour {
 	private float volLowRange;
 	private float volHighRange;
 	private Vector3 prev_loc;
+	private float playerHitTimer;
+	private float playerHitTime;
+	private bool playerCanHit;
+	private Bounds fieldBounds;
 
 	// Use this for initialization
 	void Start () {
@@ -60,6 +66,10 @@ public class BallController : MonoBehaviour {
 		volLowRange = 0.5f;
 		volHighRange = 1.0f;
 		prev_loc = transform.position;
+		playerHitTimer = 0;
+		playerHitTime = 0.5f;
+		playerCanHit = true;
+		fieldBounds = field.GetComponent<SpriteRenderer> ().sprite.bounds;
 	}
 
 	// Update is called once per frame
@@ -73,7 +83,20 @@ public class BallController : MonoBehaviour {
 			psTrail.transform.eulerAngles = new Vector3(-Vector3.Angle(cur_vel, new Vector3(1, 0, 0)), -90, 0);
 		else
 			psTrail.transform.eulerAngles = new Vector3(0, 0, 0);
-		
+
+		// Update Hit Timer
+		playerHitTimer += Time.deltaTime;
+		if (playerHitTimer > playerHitTime)
+			playerCanHit = true;
+
+		// Check if ball is still within the game field
+		if (!fieldBounds.Contains (transform.position))
+		{
+			Debug.Log ("OUT OF BOUNDS");
+			reset ();
+			startBall ();
+		}
+
 
 		//Manage Countdown
 		if (countdownTime > -1.0)
@@ -94,6 +117,7 @@ public class BallController : MonoBehaviour {
 		}
 
 		prev_loc = transform.position;
+
 	}
 
 	void countdown()
@@ -155,8 +179,9 @@ public class BallController : MonoBehaviour {
 		//   col.transform.position is the racket's position
 		//   col.collider is the racket's collider
 
-		// Hit the left Racket?
-		if (col.gameObject.tag == "Player")
+
+		// Hit Player && Player was not hit recently?
+		if (col.gameObject.tag == "Player" && playerCanHit)
 		{
 			// Calculate hit Factor
 			float y = hitFactor(transform.position,
@@ -179,8 +204,18 @@ public class BallController : MonoBehaviour {
 			}
 
 			// Set Velocity with dir * speed
-			speed = speed + velocityInc;
-			GetComponent<Rigidbody2D>().velocity = (dir * speed);
+			if (speed <= speedCap)
+				speed = speed + velocityInc;
+			rb2d.velocity = (dir * speed);
+
+			// Note that player has been hit
+			playerCanHit = false;
+			playerHitTimer = 0;
+		}
+		// If player was hit recentely or something else was hit, keep speed stable
+		else
+		{
+			rb2d.velocity = speed * (rb2d.velocity.normalized);
 		}
 	}
 
@@ -226,13 +261,7 @@ public class BallController : MonoBehaviour {
 		}
 
 		// Reset
-		rb2d.velocity = new Vector2(0, 0);
-		transform.position = startpos;
-		speed = startSpeed;
-		spriteRenderer.sprite = spriteDefault;
-		ParticleSystem.MainModule psTrailMain = psTrail.main;		//Need to store mainModule in variable before usage
-		psTrailMain.startColor = new ParticleSystem.MinMaxGradient(new Color32 (255, 127, 39, 255));
-
+		reset();
 
 		// Check if game is over
 		if(scoreP1Int >= 5 || scoreP2Int >= 5)
@@ -244,6 +273,16 @@ public class BallController : MonoBehaviour {
 			// Start again
 			startBall ();
 		}
+	}
+
+	void reset()
+	{
+		rb2d.velocity = new Vector2(0, 0);
+		transform.position = startpos;
+		speed = startSpeed;
+		spriteRenderer.sprite = spriteDefault;
+		ParticleSystem.MainModule psTrailMain = psTrail.main;		//Need to store mainModule in variable before usage
+		psTrailMain.startColor = new ParticleSystem.MinMaxGradient(new Color32 (255, 127, 39, 255));
 	}
 
 	// Display End of Game Text

@@ -86,7 +86,6 @@ public class MLGSpawner : MonoBehaviour {
 
 	string randomMlgName()
 	{
-		print (mlgNames.Length);
 		int index = Random.Range(0, mlgNames.Length);
 		return mlgNames[index];
 	}
