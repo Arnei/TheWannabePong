@@ -69,7 +69,7 @@ public class BallController : MonoBehaviour {
 		playerHitTimer = 0;
 		playerHitTime = 0.5f;
 		playerCanHit = true;
-		fieldBounds = field.GetComponent<SpriteRenderer> ().sprite.bounds;
+		fieldBounds = field.GetComponent<SpriteRenderer> ().bounds;
 	}
 
 	// Update is called once per frame
@@ -92,9 +92,10 @@ public class BallController : MonoBehaviour {
 		// Check if ball is still within the game field
 		if (!fieldBounds.Contains (transform.position))
 		{
-			Debug.Log ("OUT OF BOUNDS");
+			Debug.Log ("OUT OF BOUNDS" + fieldBounds.extents);
 			reset ();
 			startBall ();
+
 		}
 
 

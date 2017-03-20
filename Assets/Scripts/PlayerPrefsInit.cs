@@ -12,7 +12,7 @@ public class PlayerPrefsInit : MonoBehaviour {
 	public Slider musicSlider;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 		// Load last resolution if it exists
 		Screen.SetResolution (PlayerPrefs.GetInt("resWidth", 800),
 			PlayerPrefs.GetInt("resHeight", 600), 
@@ -39,8 +39,5 @@ public class PlayerPrefsInit : MonoBehaviour {
 		mixer.SetFloat ("MusicVolume", musicVolume);
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
 }

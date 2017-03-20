@@ -12,6 +12,7 @@ public class GraphicPanelInit : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		// Init resolution dropdown
+		initFullscreenDropdown (fullscreenDD, Screen.fullScreen);
 		initResolutionDropdown (resDD, Screen.fullScreen);
 
 	}
@@ -30,6 +31,24 @@ public class GraphicPanelInit : MonoBehaviour {
 	}
 	*/
 
+	public void initFullscreenDropdown(Dropdown fullscreenDD, bool fullscreen)
+	{
+		for(int i=0; i < fullscreenDD.options.Count; i++)
+		{
+			Debug.Log ("GPINIT List: " + fullscreenDD.options [i].text);
+			if (fullscreen && (fullscreenDD.options [i].text == "Fullscreen"))
+			{
+				fullscreenDD.value = i;
+				Debug.Log ("GPINIT: Fullscreen");
+			}
+			if (!fullscreen && (fullscreenDD.options [i].text == "Windowed")) 
+			{
+				fullscreenDD.value = i;
+				Debug.Log ("GPINIT: Windowed");
+			}
+		}
+	}
+
 	public void initResolutionDropdown(Dropdown resDD, bool fullscreen)
 	{
 		// Clear Dropdown List
@@ -46,10 +65,11 @@ public class GraphicPanelInit : MonoBehaviour {
 		{
 			resList.Add (resolutions[i].width + "x" + resolutions[i].height);
 			// Get current resolution
-			if (resolutions[i].width == Screen.currentResolution.width &&
-				resolutions[i].height == Screen.currentResolution.height)
+			if (resolutions[i].width == Screen.width &&			// Width and height of the player window. .currentresolution would instead give the resolution of the screen, regardless of window size
+				resolutions[i].height == Screen.height)
 			{
 				startValue = i;
+				Debug.Log ("Current REs: " + Screen.currentResolution);
 			}
 		}
 			
@@ -65,6 +85,7 @@ public class GraphicPanelInit : MonoBehaviour {
 				PlayerPrefs.SetInt("resWidth", resolutions[resDD.value].width);
 				PlayerPrefs.SetInt("resHeight", resolutions[resDD.value].height);
 				PlayerPrefs.SetInt("resFullscreen", fullscreen == true ? 1 : 0);
+				//ResolutionAdapter.AdaptCameraToResolution(); 		Does not work here
 			});
 	}
 

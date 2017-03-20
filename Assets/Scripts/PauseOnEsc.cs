@@ -16,6 +16,7 @@ public class PauseOnEsc : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
+		Time.timeScale = 1.0f; //Ensure that the game is running after the scene is reloaded
 		paused = false;
 		Button[] buttons = pausePanel.GetComponentsInChildren<Button>();
 		foreach (Button but in buttons)

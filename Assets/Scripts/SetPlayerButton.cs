@@ -9,7 +9,7 @@ public class SetPlayerButton : MonoBehaviour {
 	{
 		StartCoroutine (buttonPromptEnumerable(button));
 	}
-
+		
 	IEnumerator buttonPromptEnumerable(string button)
 	{
 		while (Input.anyKey == false || Input.GetMouseButton(0))
